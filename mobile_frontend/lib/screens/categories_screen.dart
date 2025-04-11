@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
+import 'category_recipes_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -45,69 +46,255 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
         final categories = recipeProvider.categories;
         
-        return ListView.builder(
-          padding: const EdgeInsets.only(top: 8, bottom: 80),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final category = categories[index];
-            final recipes = recipeProvider.getRecipesForCategory(category['id']);
-            
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            _getCategoryIcon(category['name']),
-                            color: Colors.pink[300],
-                            size: 24,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            category['name'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Kategoriler',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: Container(
+            color: Colors.grey[50],
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                final recipes = recipeProvider.getRecipesForCategory(category['id']);
+                final color = _getCategoryColor(category['name'] ?? '');
+                
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CategoryRecipesScreen(
+                              categoryId: category['id'],
+                              categoryName: category['name'],
                             ),
                           ),
-                        ],
-                      ),
-                      Text(
-                        '${recipes.length} tarif',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(24),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              color.withOpacity(0.05),
+                              Colors.white,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: color.withOpacity(0.1),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: _buildCategoryIcon(category['name'] ?? '', color),
+                                    ),
+                                    Positioned(
+                                      right: -4,
+                                      bottom: -4,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: color.withOpacity(0.2),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          '${recipes.length}',
+                                          style: TextStyle(
+                                            color: color,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      category['name'] ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _getCategoryDescription(category['name'] ?? ''),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  color: color,
+                                  size: 16,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 220,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: recipes.length,
-                    itemBuilder: (context, index) {
-                      final recipe = recipes[index];
-                      return SizedBox(
-                        width: 200,
-                        child: _buildRecipeCard(recipe),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            );
-          },
+                );
+              },
+            ),
+          ),
         );
       },
+    );
+  }
+
+  String _getCategoryDescription(String category) {
+    switch (category.toLowerCase()) {
+      case 'ana yemek':
+        return 'Doyurucu ana yemek tarifleri';
+      case 'aperatif':
+        return 'Pratik atıştırmalık tarifler';
+      case 'çorba':
+        return 'Sıcacık çorba tarifleri';
+      case 'içecek':
+        return 'Serinleten içecek tarifleri';
+      case 'kahvaltılık':
+        return 'Güne güzel başlangıç';
+      case 'salata':
+        return 'Hafif ve sağlıklı salatalar';
+      case 'tatlı':
+        return 'Tatlı krizine çözümler';
+      default:
+        return 'Lezzetli tarifler';
+    }
+  }
+
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'ana yemek':
+        return const Color(0xFF5C6BC0); // Soft Indigo
+      case 'aperatif':
+        return const Color(0xFFAB47BC); // Soft Purple
+      case 'çorba':
+        return const Color(0xFF26A69A); // Soft Teal
+      case 'içecek':
+        return const Color(0xFFFF7043); // Soft Deep Orange
+      case 'kahvaltılık':
+        return const Color(0xFFEC407A); // Soft Pink
+      case 'salata':
+        return const Color(0xFF66BB6A); // Soft Green
+      case 'tatlı':
+        return const Color(0xFFFFA726); // Soft Orange
+      default:
+        return const Color(0xFF78909C); // Soft Blue Grey
+    }
+  }
+
+  Widget _buildCategoryIcon(String category, Color color) {
+    String imagePath = '';
+    switch (category.toLowerCase()) {
+      case 'ana yemek':
+        imagePath = 'assets/category_images/ana_yemek.jpg';
+        break;
+      case 'aperatif':
+        imagePath = 'assets/category_images/aperatif.jpg';
+        break;
+      case 'çorba':
+        imagePath = 'assets/category_images/corba.jpg';
+        break;
+      case 'içecek':
+        imagePath = 'assets/category_images/icecek.jpg';
+        break;
+      case 'kahvaltılık':
+        imagePath = 'assets/category_images/kahvaltilik.jpg';
+        break;
+      case 'salata':
+        imagePath = 'assets/category_images/salata.jpg';
+        break;
+      case 'tatlı':
+        imagePath = 'assets/category_images/tatli.jpg';
+        break;
+      default:
+        return Icon(Icons.restaurant_menu_rounded, color: color, size: 28);
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        children: [
+          Image.asset(
+            imagePath,
+            width: 56,
+            height: 56,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  color.withOpacity(0.2),
+                  color.withOpacity(0.3),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

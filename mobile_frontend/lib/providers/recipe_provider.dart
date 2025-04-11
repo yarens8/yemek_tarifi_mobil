@@ -11,6 +11,9 @@ class RecipeProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   List<Map<String, dynamic>> get categories => _categories;
   Map<int, List<Map<String, dynamic>>> get recipesByCategory => _recipesByCategory;
+  List<Map<String, dynamic>> get recipes {
+    return recipesByCategory.values.expand((list) => list).toList();
+  }
 
   // İlk veri yüklemesi
   Future<void> loadInitialData() async {

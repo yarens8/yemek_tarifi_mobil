@@ -115,23 +115,33 @@ class _CategoryRecipesScreenState extends State<CategoryRecipesScreen> {
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.network(
-                recipe['image_file'] ?? 'https://via.placeholder.com/400x200',
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 200,
-                    color: Colors.grey[300],
-                    child: const Icon(
-                      Icons.restaurant,
-                      size: 64,
-                      color: Colors.grey,
+              child: recipe['image_filename'] != null && recipe['image_filename'].toString().isNotEmpty
+                  ? Image.asset(
+                      'assets/recipe_images/${recipe['image_filename']}',
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 200,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.restaurant,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      height: 200,
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.restaurant,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
                     ),
-                  );
-                },
-              ),
             ),
             Padding(
               padding: const EdgeInsets.all(16),

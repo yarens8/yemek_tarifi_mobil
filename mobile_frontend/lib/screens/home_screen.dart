@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
+import 'filter_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,6 +91,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             centerTitle: true,
             actions: [
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FilterScreen(),
+                    ),
+                  );
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () {
